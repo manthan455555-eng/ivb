@@ -1,26 +1,261 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  /* === BASE COLORS === */
+  --color-bg: var(--theme-bg);
+  --color-surface: var(--theme-surface);
+  --color-surface-hover: var(--theme-surface-hover);
+  --color-border: var(--theme-border);
+
+  /* === PRIMARY ACCENT === */
+  --color-accent: var(--theme-accent);
+  --color-accent-end: var(--theme-accent-end);
+
+  /* === TEXT COLORS === */
+  --color-text-primary: var(--theme-text-primary);
+  --color-text-secondary: var(--theme-text-secondary);
+  --color-text-muted: var(--theme-text-muted);
+
+  /* === STATUS COLORS === */
+  --color-success: #22C55E;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+
+  /* === TYPOGRAPHY === */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --theme-bg: #FFFFFF;
+    --theme-surface: #F5F5F6;
+    --theme-surface-hover: #EAEAEB;
+    --theme-border: #E5E7EB;
+
+    --theme-accent: #FF3F6C;
+    --theme-accent-end: #FF905A;
+
+    --theme-text-primary: #1A1A1A;
+    --theme-text-secondary: #6B6B7A;
+    --theme-text-muted: #9CA3AF;
+  }
+
+  .dark {
+    --theme-bg: #0B0B0F;
+    --theme-surface: #111118;
+    --theme-surface-hover: #16161F;
+    --theme-border: #1F1F2A;
+
+    --theme-accent: #FF3F6C;
+    --theme-accent-end: #FF905A;
+
+    --theme-text-primary: #FFFFFF;
+    --theme-text-secondary: #A1A1B2;
+    --theme-text-muted: #6B6B7A;
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background: var(--color-bg);
+    color: var(--color-text-primary);
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  ::selection {
+    background: rgba(255, 63, 108, 0.25);
+    color: var(--color-text-primary);
+  }
+
+  ::-webkit-scrollbar {
+    width: 5px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 63, 108, 0.2);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 63, 108, 0.35);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  /* === GLASS === */
+  .glass {
+    background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--color-border);
+  }
+
+  .glass-strong {
+    background: color-mix(in srgb, var(--color-surface) 90%, transparent);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    border: 1px solid var(--color-border);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+  }
+
+  /* === GRADIENT TEXT (the ONE gradient accent) === */
+  .gradient-text {
+    background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-end) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* === GRADIENT BORDER === */
+  .gradient-border {
+    position: relative;
+  }
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(255, 63, 108, 0.3), rgba(255, 144, 90, 0.3));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  /* === SUBTLE GLOW === */
+  .glow {
+    box-shadow: 0 0 20px rgba(255, 63, 108, 0.08), 0 0 60px rgba(255, 63, 108, 0.03);
+  }
+
+  .glow-strong {
+    box-shadow: 0 0 30px rgba(255, 63, 108, 0.15), 0 0 80px rgba(255, 63, 108, 0.06);
+  }
+
+  /* === BUTTONS === */
+  .btn-primary {
+    background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-end) 100%);
+    color: white;
+    font-weight: 600;
+    border-radius: 16px;
+    padding: 12px 24px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary:hover {
+    box-shadow: 0 4px 24px rgba(255, 63, 108, 0.25);
+    transform: translateY(-1px);
+  }
+  .btn-primary:active {
+    transform: translateY(0);
+  }
+
+  .btn-secondary {
+    background: rgba(255, 63, 108, 0.08);
+    color: var(--color-text-secondary);
+    font-weight: 600;
+    border-radius: 16px;
+    padding: 12px 24px;
+    border: 1px solid var(--color-border);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .btn-secondary:hover {
+    background: rgba(255, 63, 108, 0.12);
+    border-color: rgba(255, 63, 108, 0.2);
+    color: var(--color-text-primary);
+  }
+
+  /* === INPUT FIELD === */
+  .input-field {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    padding: 12px 16px;
+    color: var(--color-text-primary);
+    font-size: 14px;
+    transition: all 0.3s ease;
+    width: 100%;
+    outline: none;
+  }
+  .input-field:focus {
+    border-color: rgba(255, 63, 108, 0.4);
+    box-shadow: 0 0 0 3px rgba(255, 63, 108, 0.08);
+  }
+  .input-field::placeholder {
+    color: var(--color-text-muted);
+  }
+
+  /* === CARD === */
+  .card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    padding: 24px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .card:hover {
+    border-color: rgba(255, 63, 108, 0.15);
+  }
+
+  /* === SKELETON === */
+  .skeleton {
+    background: linear-gradient(90deg, var(--color-surface) 25%, var(--color-surface-hover) 50%, var(--color-surface) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+    border-radius: 16px;
+  }
+
+  @keyframes skeleton-pulse {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* === SHIMMER === */
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  .shimmer::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 63, 108, 0.05), transparent);
+    animation: shimmer 2s ease-in-out infinite;
+  }
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  /* === FLOATING === */
+  .floating {
+    animation: float 6s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  /* === PULSE GLOW === */
+  .pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 16px rgba(255, 63, 108, 0.12); }
+    50% { box-shadow: 0 0 32px rgba(255, 63, 108, 0.2); }
+  }
 }

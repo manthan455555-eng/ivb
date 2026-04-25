@@ -32,6 +32,16 @@ export default function OnboardingPage() {
     const router = useRouter();
     const { token, updateUser } = useAuthStore();
 
+    useEffect(() => {
+        if (step === 2) {
+            const timer = setTimeout(() => {
+                setLoading(false);
+                router.push('/dashboard');
+            }, 3500);
+            return () => clearTimeout(timer);
+        }
+    }, [step, router]);
+
     const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
@@ -51,28 +61,41 @@ export default function OnboardingPage() {
 
     const generateProfile = async () => {
         setLoading(true);
+        let success = false;
         try {
-            const res = await fetch('/api/profile', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    preferences: selectedStyles,
-                    avatar: photoPreview,
-                }),
-            });
-            const data = await res.json();
-            if (data.user) {
-                setProfileResult(data.user.styleProfile);
-                updateUser(data.user);
-                setStep(3);
-            }
+            const analyzeUser = async () => {
+                const res = await fetch(`${window.location.origin}/api/profile`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        preferences: selectedStyles,
+                        avatar: photoPreview,
+                    }),
+                });
+                if (!res.ok) throw new Error('API failed');
+                const data = await res.json();
+                if (data.user) {
+                    setProfileResult(data.user.styleProfile);
+                    updateUser(data.user);
+                    success = true;
+                    setStep(3);
+                }
+            };
+
+            await Promise.race([
+                analyzeUser(),
+                new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 3000))
+            ]);
         } catch (err) {
-            console.error(err);
+            console.error("Analyze failed:", err);
         } finally {
             setLoading(false);
+            if (!success) {
+                router.push('/dashboard');
+            }
         }
     };
 
